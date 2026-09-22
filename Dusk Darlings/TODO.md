@@ -27,9 +27,28 @@ unfinished.
       environment has no Ren'Py runtime; everything so far is statically
       checked, not played)
 
+## Story direction correction (done this session)
+- [x] Identified DDLC-resembling structure in the prologue (club recruitment,
+      "welcome to the club," a member reacting to a newcomer)
+- [x] Removed the club premise entirely (`club_name`, `agreed_to_visit` gone)
+- [x] Rewrote the prologue as an ordinary morning (wake up → walk to school
+      with Skit → arrive at school), no foreshadowing, no club
+- [x] Reworked Skit's dialogue to match her actual profile (shy/kind/helpful,
+      not boisterous/teasing)
+- [x] Removed the DDLC-style hidden-name reveal for Skit (didn't make sense
+      for an established childhood friend anyway)
+- [x] Renamed the clubroom location/art to the library, removed the
+      `joined_club` flag gating it — it's now a plain, always-open location
+- [x] Confirmed Riel/Mary/Blaire are not introduced anywhere yet, and won't
+      be introduced together when they are
+- [x] Re-ran the full static check (labels/jumps/screens/images) after the rewrite
+- [x] Updated DEVELOPMENT.md with what changed and why
+
 ## Phase 2 — Riel vertical slice (NEXT)
 - [ ] Riel character data (extend `cast["riel"]`)
-- [ ] Riel introduction scene (write real content into `loc_clubroom`)
+- [ ] Riel's first-meeting scene — write it into `loc_library` (fits her
+      profile: books, chess, quiet environments). Standalone scene, not a
+      group introduction with Mary/Blaire.
 - [ ] Riel-specific dialogue
 - [ ] Affection / Impression / Memory actually wired up (not just the empty shape)
 - [ ] Likes/dislikes (books, chess, coffee, quiet environments, per her profile)
@@ -45,7 +64,8 @@ unfinished.
 - [ ] Phase 4 — Economy and job
 - [ ] Phase 5 — Gift and date system (generalized)
 - [ ] Phase 6 — Character minigames (Mary/Blaire/Skit)
-- [ ] Phase 7 — Complete cast (Mary, Blaire, Skit full routes)
+- [ ] Phase 7 — Complete cast (Mary, Blaire, Skit full routes — each their own
+      standalone first-meeting scene, per the corrected direction above)
 - [ ] Phase 8 — The curse
 - [ ] Phase 9 — Adaptive death/prevention
 - [ ] Phase 10 — Save/timeline system
@@ -67,7 +87,8 @@ unfinished.
 "tested" means right now)
 
 ## Open questions for you
-- Confirm Skit is the right character for the prologue's childhood-friend role
-  (assumed based on "usually the one that helps you" — easy to change if not)
 - Starting `player_money` of ₱150 is a placeholder guess — change the default
   in `core/gamestate.rpy` if you have a real number in mind
+- The library is set up as a likely first-meeting spot for Riel specifically
+  (books/chess/quiet environments) — confirm that fits your plan for her, or
+  tell me where you'd rather introduce each of the four instead

@@ -71,7 +71,7 @@ init -1 python:
             """Append a memory note. Safe to call from anywhere once Phase 3 wires it up."""
             self.memory.append("Day %d (%s): %s" % (game_day, GAME_PERIODS[game_period], note))
 
-## One CharacterData per club member. Created once, at game start (not
+## One CharacterData per love interest. Created once, at game start (not
 ## inside a label), so it exists from the very first frame and is saved
 ## automatically like everything else in the store.
 default cast = {
@@ -88,7 +88,7 @@ default cast = {
 ################################################################################
 
 default story_flags = set()   # generic "this happened" markers, e.g. "met_skit",
-                               # "joined_club". Check with:  "met_skit" in story_flags
+                               # "met_riel". Check with:  "met_skit" in story_flags
                                # Set with:                   $ story_flags.add("met_skit")
 
 init -1 python:

@@ -43,15 +43,13 @@ screen status_bar():
 
 label day_loop_start:
 
-    ## Fold in what already happened during the prologue in intro.rpy.
+    ## Fold in what already happened during intro.rpy.
     $ set_flag("met_skit")
     $ cast["skit"].met = True
-    if agreed_to_visit:
-        $ set_flag("joined_club")
 
-    ## The prologue covers Day 1's morning and school day itself, so gameplay
-    ## proper picks up that same afternoon rather than repeating it.
-    $ game_period = GAME_PERIODS.index("Afternoon")
+    ## intro.rpy covers Day 1's morning and the walk to school, so gameplay
+    ## proper picks up right as the school day itself begins.
+    $ game_period = GAME_PERIODS.index("School")
 
     show screen status_bar
 
@@ -129,11 +127,13 @@ label hub_lunch:
         "Eat in the cafeteria.":
             jump loc_cafeteria
 
-        "Go to the clubroom." if flag("joined_club"):
-            jump loc_clubroom
+        "Go to the library.":
+            jump loc_library
 
 label loc_cafeteria:
-    "{i}(placeholder - the cafeteria scene goes here.){/i}"
+    "{i}(placeholder - the cafeteria scene goes here. A natural, ordinary spot for a
+    character to be encountered in passing - a conversation at a shared table,
+    someone saving a seat, that kind of thing.){/i}"
     jump advance_period_do
 
 ################################################################################
@@ -141,22 +141,22 @@ label loc_cafeteria:
 ################################################################################
 
 label hub_afternoon:
-    if flag("joined_club"):
-        scene bg clubroom with dissolve
-    else:
-        scene bg street with dissolve
+    scene bg street with dissolve
     "Afternoon, Day [game_day]. {i}(placeholder - describe the afternoon here.){/i}"
 
     menu:
-        "Go to the clubroom." if flag("joined_club"):
-            jump loc_clubroom
+        "Go to the library.":
+            jump loc_library
 
         "Go into town.":
             jump loc_street
 
-label loc_clubroom:
-    scene bg clubroom with dissolve
-    "{i}(placeholder - clubroom scene goes here. This is where Riel, Mary and Blaire's\nintroductions will go.){/i}"
+label loc_library:
+    scene bg library with dissolve
+    "{i}(placeholder - library scene goes here. This is a good natural spot for a
+    quiet, studious character to already be here when the player walks in, rather
+    than being introduced all at once - Riel's profile (books, chess, quiet
+    environments) fits this location especially well.){/i}"
     jump advance_period_do
 
 ################################################################################

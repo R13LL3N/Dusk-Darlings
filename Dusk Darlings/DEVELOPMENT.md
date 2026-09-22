@@ -59,6 +59,65 @@ No other architectural changes. The menu and prologue are otherwise untouched.
 
 ---
 
+## Story direction correction (post-Phase-1)
+
+**Problem:** the prologue I wrote in `intro.rpy` during Phase 0/1 directly
+resembled DDLC's Literature Club opening — a club about to be shut down for
+lack of members, the childhood friend pulling the protagonist in ("you're
+coming anyway"), a "Welcome to the [club]" line, and another character
+reacting to a newcomer ("...You brought someone."). This is exactly what
+`Anti_DDLC.txt` rules out, and I didn't check my own draft against it closely
+enough before building Phase 1 on top of it. Caught and corrected in the same
+session, before any further phases were built on top of it.
+
+**What changed:**
+- **Removed the club premise entirely.** No Literature Club, no renamed
+  equivalent, no recruitment plot, no "everyone's really nice, you'll love
+  it" pressure. `club_name` and `agreed_to_visit` are gone from `intro.rpy`.
+- **Rewrote the whole prologue.** It's now just an ordinary morning: waking
+  up, a mundane exchange with Mom, the walk to school with Skit (who lends
+  the player an umbrella — a small, ordinary "usually the one who helps you"
+  beat instead of a stated trait), and arriving at the school gate. No white
+  flash, no "I promise you'll never want to leave" foreshadowing — per
+  `Anti_DDLC.txt`'s tone-progression rule, Day 1 should read as completely
+  normal, with nothing supernatural hinted at yet.
+- **Reworked Skit's characterization to actually match her profile.** The
+  original draft wrote her as boisterous/teasing, which was closer to a
+  Sayori-style dynamic and didn't match "shy, kind, usually helps you" as
+  specified. She's now quieter and more practical (the umbrella, short
+  sentences, doesn't quite make eye contact).
+- **Removed the DDLC-style hidden-name reveal for Skit.** `skit_name`
+  (`"???"` until an introduction scene) didn't make narrative sense anyway —
+  Skit is an established childhood friend, so the player already knows her
+  name from the first line. `characters.rpy` now defines her the same plain
+  way as the other three.
+- **Riel, Mary, and Blaire are not in the prologue at all**, and aren't
+  introduced together anywhere. Per `Anti_DDLC.txt`'s instruction to let the
+  player "gradually encounter them through normal circumstances," each of
+  them gets their own separate first-meeting scene, on their own schedule,
+  written later (Phase 2 onward) into the ordinary locations already sitting
+  in `core/day_loop.rpy` — the library, the cafeteria, class, town, etc. —
+  rather than through one artificial group scene.
+- **Renamed the "clubroom" location to the library** (`bg clubroom.png` →
+  `bg library.png`, background art regenerated to read clearly as a library
+  rather than a generic room), and removed the `joined_club` flag that
+  gated it. It's now just an ordinary, always-available Lunch/Afternoon
+  location — and a natural first-meeting spot for Riel specifically, given
+  her stated love of books and quiet environments, though that scene hasn't
+  been written yet.
+
+**What did NOT change:** the Phase 1 systems themselves — the day/time loop,
+`GAME_PERIODS`, `CharacterData`, `story_flags`, the hub/location structure,
+save data — none of that was DDLC-shaped to begin with, so none of it needed
+to be rebuilt. Only the content sitting inside it (the prologue's scene, one
+flag, one location's name/art) changed. This is also why the fix was cheap:
+the architecture was already generic enough to not need touching.
+
+The "Important variable/state names" and "Next recommended task" sections
+below are updated to match the corrected version.
+
+---
+
 ## Phase 1 — Core game framework (implemented this session)
 
 New folder: `game/core/` — kept separate from the menu/prologue files so
@@ -79,18 +138,17 @@ they can keep evolving independently.
   affection/impression/memory. `CharacterData.remember(note)` is a
   ready-to-use hook for that once it's wired up.
 - **Event system skeleton:** `story_flags` (a plain `set()`), with
-  `flag("x")` / `set_flag("x")` helpers. `"joined_club" in story_flags` is
-  already live — see below.
+  `flag("x")` / `set_flag("x")` helpers.
 
 ### `core/day_loop.rpy` — the loop itself
-- `day_loop_start` — entry point, jumped to from `intro.rpy`'s old
-  `ch1_start` stub.
+- `day_loop_start` — entry point, jumped to directly from the end of
+  `intro.rpy`.
 - `day_hub` — routes to the current period's `hub_<period>` label. Re-entered
   after every location and every period advance; this is the loop's center.
 - `hub_morning` / `hub_school` / `hub_lunch` / `hub_afternoon` /
   `hub_evening` / `hub_night` — one menu per period, offering that period's
   locations as choices.
-- `loc_*` labels — one per placeholder location (school, cafeteria, clubroom,
+- `loc_*` labels — one per placeholder location (school, cafeteria, library,
   street, home, sleep). Currently a single placeholder line each, wrapped in
   `{i}(...)/{i}` so they're obviously stand-ins. **This is where your story
   content goes** — the surrounding menu/flag/time-advance structure doesn't
@@ -104,18 +162,13 @@ they can keep evolving independently.
   the menu's custom Poppins font — confirmed DejaVu has a ₱ glyph and Poppins
   doesn't, so this was a deliberate choice, not an oversight.
 
-### Integration with the existing prologue
-`intro.rpy`'s `agreed_to_visit` variable (set by the club-invitation menu
-choice) is read on entry to the day loop: if `True`, `set_flag("joined_club")`
-is set, which unlocks the clubroom as a Lunch/Afternoon location. If the
-player declined in the prologue, the clubroom stays locked and they get the
-street instead — this was the first integration test (see below) and it
-passes.
-
-Day 1 specifically starts at **Afternoon**, not Morning — the prologue
-already covers that day's morning and school walk narratively, so the loop
-picks up where it left off instead of repeating it. Every day after that
-starts at Morning normally.
+### Integration with the prologue
+`intro.rpy` now hands off straight into `day_loop_start` with no flags to
+read (the `agreed_to_visit`/`joined_club` mechanic was removed along with the
+club premise — see "Story direction correction" above). Day 1 starts at
+**School**, not Morning — the prologue already covers that day's morning and
+walk to school narratively, so the loop picks up right as the school day
+itself begins. Every day after that starts at Morning normally.
 
 ### Save data structure
 Everything above is declared with Ren'Py's `default` statement (never
@@ -137,20 +190,23 @@ before trusting this.**
 
 - Wrote a small script to scan every `.rpy` file for: duplicate `label`
   definitions, duplicate `screen` definitions, `jump`/`call` targets that
-  don't resolve to a real label, and `call screen` targets that don't
-  resolve to a real screen. Result: no unresolved targets, no duplicate
-  labels. (Two `quick_menu` screens and one UI `label _(message):` flagged
-  initially — both are pre-existing, correct Ren'Py template code: the
-  former is a touch-screen variant of the same screen, the latter is a
-  screen-language `label` *widget*, not a script label. Not bugs.)
+  don't resolve to a real label, `call screen` targets that don't resolve to
+  a real screen, and (after the rewrite) every `scene`/`show` of a `bg`/
+  `skit` image resolving to a real file. Result: no unresolved targets, no
+  duplicate labels, no missing images. (Two `quick_menu` screens and one UI
+  `label _(message):` flagged initially — both are pre-existing, correct
+  Ren'Py template code: the former is a touch-screen variant of the same
+  screen, the latter is a screen-language `label` *widget*, not a script
+  label. Not bugs.)
 - Checked indentation (multiples of 4, no tabs) and bracket/quote balance in
   every new/edited file.
 - Manually traced the full loop logic by hand: Morning → School → Lunch →
   Afternoon → Evening → Night → day rollover back to Morning, including the
-  `joined_club` branch at Lunch/Afternoon and the reputation-adjusting School
-  choices.
+  reputation-adjusting School choices.
 - Grepped the whole project for leftover references to the old character
-  names (`mika`, `char2`–`char4`, `m_name`) after the merge — none found.
+  names (`mika`, `char2`–`char4`, `m_name`) after the earlier merge, and
+  again for `club`/`agreed_to_visit`/`skit_name` after this rewrite — none
+  found outside explanatory comments.
 
 ---
 
@@ -173,8 +229,6 @@ code," not "verified bug-free."
 | `player_reputation` | gamestate.rpy | dict, trait → int |
 | `cast` | gamestate.rpy | dict, `"riel"/"mary"/"blaire"/"skit"` → `CharacterData` |
 | `story_flags` | gamestate.rpy | set of story flag strings |
-| `agreed_to_visit` | intro.rpy | set by the prologue's club-invitation choice |
-| `skit_name` | characters.rpy | drives Skit's `[skit_name]` display name, `"???"` until revealed |
 | `persistent.menu_stage` | main_menu.rpy | 0 = normal menu, 1 = dark/glitch stage |
 | `persistent.menu_hidden` | main_menu.rpy | list of character keys hidden from the menu art |
 
@@ -184,10 +238,13 @@ code," not "verified bug-free."
 
 **Phase 2 — Riel vertical slice.** Per the master instruction, this should
 happen before touching Mary, Blaire, or the tragedy/horror systems. Concretely,
-that means writing real content into `loc_clubroom` (Riel's introduction) and
-building her affection/impression/memory/gift/date/minigame/confession loop
-on top of the `CharacterData` shape that already exists in `cast["riel"]`.
+that means writing Riel's first-meeting scene into `loc_library` (a natural
+fit, given her stated love of books/chess/quiet environments) and building
+her affection/impression/memory/gift/date/minigame/confession loop on top of
+the `CharacterData` shape that already exists in `cast["riel"]`. Remember:
+per `Anti_DDLC.txt`, this should be a standalone, ordinary first meeting —
+not a scene that also introduces Mary or Blaire at the same time.
 
 You mentioned you're handling the story/dialogue writing yourself and may
-want help with Ren'Py syntax examples as you go — the `loc_clubroom` label in
+want help with Ren'Py syntax examples as you go — `loc_library` in
 `core/day_loop.rpy` is the natural place to start once you're ready.
