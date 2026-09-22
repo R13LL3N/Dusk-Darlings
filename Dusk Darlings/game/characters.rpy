@@ -13,13 +13,13 @@
 ## introduce themselves - the classic DDLC-style reveal.
 ################################################################################
 
-define riel   = Character("Riel",   color="#e8759f")   # smart, stoic
-define mary   = Character("Mary",   color="#8a6cff")   # laidback, calm, friendly
-define blaire = Character("Blaire", color="#f2a03d")   # outgoing, tomboyish, quick to anger
+define riel   = Character("Riel",   color="#fcf2f6")   # smart, stoic
+define mary   = Character("Mary",   color="#76747e4b")   # laidback, calm, friendly
+define blaire = Character("Blaire", color="#241515")   # outgoing, tomboyish, quick to anger
 
 ## Skit's display name is a variable, not a fixed string, so it can show "???"
 ## before the reveal and "Skit" after. intro.rpy sets skit_name to "Skit" the
 ## moment they introduce themselves. If you want the same hidden-name trick
 ## for Riel, Mary or Blaire later, copy this pattern for them too.
 default skit_name = "???"
-define skit = Character("[skit_name]", color="#2fbfa5")   # shy, kind, helpful
+define skit = Character("[skit_name]", color="#7cb4aa")   # shy, kind, helpful
